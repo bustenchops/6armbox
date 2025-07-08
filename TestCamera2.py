@@ -7,7 +7,7 @@ picam2 = Picamera2()
 
 # Configure the camera for video recording
 print('configure cam')
-video_config = picam2.create_video_configuration(main={"size": (1920, 1080)})
+video_config = picam2.create_video_configuration(main={"size": (640, 480)})
 picam2.configure(video_config)
 
 # Set up the H.264 encoder
@@ -16,7 +16,7 @@ encoder = H264Encoder()
 
 # Start the camera preview (optional)
 print('preview start')
-picam2.start_preview(Preview.NULL)  # Use Preview.NULL if no preview is needed
+picam2.start_preview(Preview.QTGL)  # Use Preview.NULL if no preview is needed
 
 # Start the camera
 print('start camera')
