@@ -30,7 +30,7 @@ picam2.start_encoder(encoder, output_file)
 print("Recording started. Press Ctrl+C to stop.")
 try:
     # Record for a specific duration or until interrupted
-    time.sleep(10)  # Replace with desired recording duration in seconds
+    time.sleep(20)  # Replace with desired recording duration in seconds
 except KeyboardInterrupt:
     print("Recording stopped by user.")
 
