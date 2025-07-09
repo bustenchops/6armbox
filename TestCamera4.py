@@ -34,13 +34,13 @@ try:
         if keyboard.is_pressed('t'):  # Start recording when 't' is pressed
             if not picam2.recording:
                 print("Recording started...")
-                picam2.start_recording(output_file)
+                picam2.start_(output_file)
                 while keyboard.is_pressed('t'):
                     print("Recording started. Press P to stop.")# Wait for key release
                     time.sleep(0.1)
 
         if keyboard.is_pressed('p'):  # Stop recording when 'p' is pressed
-            if camera.recording:
+            if picam2.recording:
                 print("Recording stopped.")
                 picam2.stop_recording()
                 filenumber += 1
