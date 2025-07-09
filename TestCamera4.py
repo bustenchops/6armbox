@@ -2,8 +2,6 @@ from picamera2 import Picamera2, Preview
 from picamera2.encoders import H264Encoder
 import time
 
-from TestCamera2 import output_file
-
 # Initialize the camera
 picam2 = Picamera2()
 
