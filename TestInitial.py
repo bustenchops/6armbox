@@ -2,7 +2,7 @@ import cv2
 import time
 
 # Initialize video capture
-capture = cv2.VideoCapture(0)
+capture = cv2.VideoCapture(1900)
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 capture.set(cv2.CAP_PROP_FPS, 30)  # Requesting 30 FPS from the camera
