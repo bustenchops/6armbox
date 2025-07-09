@@ -24,7 +24,7 @@ picam2.start()
 
 # Start recording to a file
 print('start recording to file')
-filenumber = 1
+filenumber = 5
 output_file = f"video_output_{filenumber}.h264"
 
 try:
@@ -37,8 +37,7 @@ try:
 
         picam2.stop_encoder()
         print("Recording stopped.")
-        filenumber += 1
-        output_file = f"video_output_{filenumber}.h264"
+        output_file = f"video_output_{x}.h264"
         time.sleep(1)
 
 
@@ -46,6 +45,6 @@ except KeyboardInterrupt:
     print("Recording stopped by user.")
 
 # Stop recording and clean up
-picam2.stop_encoding()
+picam2.stop_encoder()
 picam2.stop()
 picam2.close()
