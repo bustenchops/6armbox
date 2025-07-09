@@ -1,7 +1,6 @@
 from picamera2 import Picamera2, Preview
 from picamera2.encoders import H264Encoder
 import time
-import keyboard
 
 # Initialize the camera
 picam2 = Picamera2()
@@ -29,20 +28,9 @@ filenumber = 1
 output_file = f"video_output_{filenumber}.h264"
 doingitsthing = 0
 picam2.start_encoder(encoder, output_file)
+
 print("Recording started. Press Ctrl+C to stop.")
-
-
 try:
-    while True:
-        if keyboard.is_pressed('t'):  # Start recording when 't' is pressed
-            if doingitsthing == 0:
-                print("Recording started...")
-                picam2.start_encoder(encoder, output_file)
-                doingitsthing = 1
-                while keyboard.is_pressed('t'):
-                    print("Recording started. Press P to stop.")  # Wait for key release
-                    time.sleep(0.1)
-            print("The camera is actively recording.")
     # Record for a specific duration or until interrupted
     time.sleep(20)  # Replace with desired recording duration in seconds
 except KeyboardInterrupt:
