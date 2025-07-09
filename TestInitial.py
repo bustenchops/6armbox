@@ -3,8 +3,8 @@ import time
 
 # Initialize video capture
 capture = cv2.VideoCapture(0)
-capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 576)
+capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 capture.set(cv2.CAP_PROP_FPS, 30)  # Requesting 30 FPS from the camera
 
 # Background subtractor
@@ -19,7 +19,7 @@ prev_time = time.time()
 # Video writer initialization with explicit FPS
 save_fps = 15.0  # Adjust this based on your actual processing speed
 fourcc = cv2.VideoWriter_fourcc(*"XVID")
-out = cv2.VideoWriter("output.avi", fourcc, save_fps, (1024, 576))
+out = cv2.VideoWriter("output.avi", fourcc, save_fps, (640, 480))
 
 while True:
     ret, frame = capture.read()
