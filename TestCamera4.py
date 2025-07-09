@@ -30,8 +30,8 @@ filenumber = 1
 output_file = f"video_output_{filenumber}.h264"
 
 try:
-    for x in range(filenumber)
-
+    for x in range(filenumber):
+        print(f"file_{x}")
         picam2.start_encoder(encoder, output_file)
         print("Recording started...")
 
