@@ -12,7 +12,7 @@ picam2.configure(video_config)
 
 # Set up the H.264 encoder
 print('encoder defined')
-encoder = H264Encoder(bitrate=3000000)
+encoder = H264Encoder()
 
 # Start the camera preview (optional)
 print('preview start')
