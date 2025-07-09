@@ -44,7 +44,7 @@ try:
         if keyboard.is_pressed('p'):  # Stop recording when 'p' is pressed
             if doingitsthing == 1:
                 print("Recording stopped.")
-                picam2.stop_encoding()
+                picam2.stop_encoder()
                 filenumber += 1
                 output_file = f"video_output_{filenumber}.h264"
                 doingitsthing = 0

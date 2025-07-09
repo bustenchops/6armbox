@@ -27,10 +27,9 @@ picam2.start()
 print('start recording to file')
 filenumber = 1
 output_file = f"video_output_{filenumber}.h264"
-doingitsthing = 0
+doingitsthing = 1
 picam2.start_encoder(encoder, output_file)
 print("Recording started. Press Ctrl+C to stop.")
-
 
 try:
     while True:
@@ -42,9 +41,18 @@ try:
                 while keyboard.is_pressed('t'):
                     print("Recording started. Press P to stop.")  # Wait for key release
                     time.sleep(0.1)
-            print("The camera is actively recording.")
-    # Record for a specific duration or until interrupted
-    time.sleep(20)  # Replace with desired recording duration in seconds
+
+        if keyboard.is_pressed('p'):  # Stop recording when 'p' is pressed
+            if doingitsthing == 1:
+                print("Recording stopped.")
+                picam2.stop_encoder()
+                filenumber += 1
+                output_file = f"video_output_{filenumber}.h264"
+                doingitsthing = 0
+                while keyboard.is_pressed('p'):
+                    print('stopped')# Wait for key release
+                    time.sleep(0.1)
+
 except KeyboardInterrupt:
     print("Recording stopped by user.")
 
