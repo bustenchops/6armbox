@@ -58,6 +58,6 @@ except KeyboardInterrupt:
     print("Recording stopped by user.")
 
 # Stop recording and clean up
-picam2.stop_recording()
+picam2.stop_encoding()
 picam2.stop()
 picam2.close()
