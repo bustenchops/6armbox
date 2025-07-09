@@ -19,7 +19,7 @@ encoder = H264Encoder(bitrate=3000000)
 
 # Start the camera preview (optional)
 print('preview start')
-picam2.start_preview(Preview.NULL)  # Use Preview.NULL if no preview is needed
+# picam2.start_preview(Preview.NULL)  # Use Preview.NULL if no preview is needed
 
 # Start the camera
 print('start camera')
