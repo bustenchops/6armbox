@@ -33,7 +33,7 @@ doingitsthing = 0
 try:
     while True:
         if keyboard.is_pressed('t'):  # Start recording when 't' is pressed
-            if doingitsthing = 0:
+            if doingitsthing == 0:
                 print("Recording started...")
                 picam2.start_encoder(encoder, output_file)
                 doingitsthing = 1
@@ -42,7 +42,7 @@ try:
                     time.sleep(0.1)
 
         if keyboard.is_pressed('p'):  # Stop recording when 'p' is pressed
-            if doingitsthing = 1:
+            if doingitsthing == 1:
                 print("Recording stopped.")
                 picam2.stop_encoding()
                 filenumber += 1
