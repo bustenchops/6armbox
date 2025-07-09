@@ -24,37 +24,35 @@ import keyboard
 # picam2.start()
 
 # Start recording to a file
-print('start recording to file')
-filenumber = 1
-output_file = f"video_output_{filenumber}.h264"
+# print('start recording to file')
+# filenumber = 1
+# output_file = f"video_output_{filenumber}.h264"
 doingitsthing = 1
-# picam2.start_encoder(encoder, output_file)
-print("Recording started. Press Ctrl+C to stop.")
+# # picam2.start_encoder(encoder, output_file)
+# print("Recording started. Press Ctrl+C to stop.")
+#
+# try:
+while True:
+   if keyboard.is_pressed('t'):  # Start recording when 't' is pressed
+       if doingitsthing == 0:
+           print("Recording started...")
+           # picam2.start_encoder(encoder, output_file)
+           doingitsthing = 1
+           while keyboard.is_pressed('t'):
+               print("Recording started. Press P to stop.")  # Wait for key release
+               time.sleep(0.1)
 
-try:
-    while True:
-        if keyboard.is_pressed('t'):  # Start recording when 't' is pressed
-            if doingitsthing == 0:
-                print("Recording started...")
-                # picam2.start_encoder(encoder, output_file)
-                doingitsthing = 1
-                while keyboard.is_pressed('t'):
-                    print("Recording started. Press P to stop.")  # Wait for key release
-                    time.sleep(0.1)
+   if keyboard.is_pressed('p'):  # Stop recording when 'p' is pressed
+       if doingitsthing == 1:
+           print("Recording stopped.")
+           # picam2.stop_encoder()
+           filenumber += 1
+           output_file = f"video_output_{filenumber}.h264"
+           doingitsthing = 0
+           while keyboard.is_pressed('p'):
+               print('stopped')# Wait for key release
+               time.sleep(0.1)
 
-        if keyboard.is_pressed('p'):  # Stop recording when 'p' is pressed
-            if doingitsthing == 1:
-                print("Recording stopped.")
-                # picam2.stop_encoder()
-                filenumber += 1
-                output_file = f"video_output_{filenumber}.h264"
-                doingitsthing = 0
-                while keyboard.is_pressed('p'):
-                    print('stopped')# Wait for key release
-                    time.sleep(0.1)
-
-except KeyboardInterrupt:
-    print("Recording stopped by user.")
 
 # Stop recording and clean up
 # picam2.stop_encoder()
