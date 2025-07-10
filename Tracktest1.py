@@ -20,8 +20,8 @@ if __name__ == '__main__':
             tracker = cv2.TrackerBoosting_create()
         if tracker_type == 'MIL':
             tracker = cv2.TrackerMIL_create()
-        #if tracker_type == 'KCF':
-        #    tracker = cv2.TrackerKCF_create()
+        if tracker_type == 'KCF':
+            tracker = cv2.TrackerKCF_create()
         if tracker_type == 'TLD':
             tracker = cv2.TrackerTLD_create()
         if tracker_type == 'MEDIANFLOW':
