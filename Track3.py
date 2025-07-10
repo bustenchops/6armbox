@@ -12,17 +12,17 @@ picam2.configure(camera_config)
 picam2.start()
 
 try:
-while True:
-# Capture a frame
-frame = picam2.capture_array()
+    while True:
+        # Capture a frame
+        frame = picam2.capture_array()
 
-# Display the frame using OpenCV
-cv2.imshow("Camera Feed", frame)
+        # Display the frame using OpenCV
+        cv2.imshow("Camera Feed", frame)
 
-# Break the loop on 'q' key press
-if cv2.waitKey(1) & 0xFF == ord('q'):
-break
+        # Break the loop on 'q' key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 finally:
-# Release resources
-picam2.stop()
-cv2.destroyAllWindows()
+    # Release resources
+    picam2.stop()
+    cv2.destroyAllWindows()
