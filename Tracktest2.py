@@ -6,7 +6,7 @@ import numpy as np
 cap = cv2.VideoCapture(0)  # For a webcam feed
 
 ret, frame = cap.read()
-frame = cv2.resize(frame, (640, 480))
+# frame = cv2.resize(frame, (640, 480))
 
 gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
