@@ -8,7 +8,7 @@ cap = cv2.VideoCapture(0)  # For a webcam feed
 ret, frame = cap.read()
 # frame = cv2.resize(frame, (640, 480))
 
-gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+# gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 tracker = cv2.TrackerKCF.create()  # For KCF note from https://stackoverflow.com/questions/72736551/opencv-trackers-not-recognized-attributeerror-module-cv2-has-no-attribute-t
 
