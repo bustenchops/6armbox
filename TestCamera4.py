@@ -25,7 +25,7 @@ picam2.start()
 # Start recording to a file
 print('start recording to file')
 filenumber = 5
-output_file = f"video_output_{filenumber}.h264"
+output_file = f"video_output_{x}.h264"
 
 try:
     for x in range(filenumber):
