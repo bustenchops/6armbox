@@ -179,4 +179,16 @@ def main():
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
             cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
             cv2.putText(frame, f"Q{q}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
-            cv2.circle(frame, bonus1_center, r, (0,
+            cv2.circle(frame, bonus1_center, r, (0, 165, 255), 2)
+            cv2.rectangle(frame, (bonus2_tlx, bonus2_tly), (bonus2_tlx + s, bonus2_tly + s), (0, 165, 255), 2)
+
+            cv2.imshow("Tracking", frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                grabber.stop()
+                grabber.join()
+                picam2.stop()
+                cv2.destroyAllWindows()
+                return
+
+if __name__ == "__main__":
+    main()
