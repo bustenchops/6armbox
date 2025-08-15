@@ -65,7 +65,7 @@ def main():
     tracker.init(frame, bbox)
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    writer = cv2.VideoWriter('output_moments_tracking.avi', fourcc, 30.0, (WIDTH, HEIGHT), True)
+    writer = cv2.VideoWriter('output_moments_tracking.avi', fourcc, 24.0, (WIDTH, HEIGHT), True)
 
     prev_time = time.time()
     fps = 0.0
