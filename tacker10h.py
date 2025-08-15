@@ -33,6 +33,7 @@ def find_moving_object_bbox(current_frame, previous_frame, min_area=500):
     if not moving_contours:
         return None
 
+    # Use moments to find centroid of the largest moving contour
     moving_object = max(moving_contours, key=cv2.contourArea)
     moments = cv2.moments(moving_object)
 
