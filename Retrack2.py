@@ -85,4 +85,102 @@ def main():
     print("Press spacebar to start tracking...")
     while True:
         frame = picam2.capture_array()
-        cv2.putText(frame, "Press SPACE to start", (10, 30), cv2.FONT_HERSHEY_SIMPLE
+        cv2.putText(frame, "Press SPACE to start", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+        cv2.imshow("Camera Feed", frame)
+        if cv2.waitKey(1) & 0xFF == ord(' '):
+            break
+
+    previous_frame = picam2.capture_array()
+    tracker = None
+    tracking = False
+    paused = False
+    last_position = None
+    stationary_start = None
+    video_writer = None
+    log_writer = None
+    log_file = None
+    frame_count = 0
+
+    while True:
+        frame = picam2.capture_array()
+        draw_zones(frame)
+        timestamp = datetime.datetime.now()
+        frame_count += 1
+
+        if not paused:
+            if tracker is None or not tracking:
+                bbox = find_moving_object_bbox(frame, previous_frame)
+                if bbox:
+                    tracker = create_tracker()
+                    tracker.init(frame, bbox)
+                    tracking = True
+                    stationary_start = time.time()
+                    video_filename = generate_filename(base_time, sample_number, session_number, "video.mp4")
+                    log_filename = generate_filename(base_time, sample_number, session_number, "log.csv")
+                    video_writer = cv2.VideoWriter(video_filename, cv2.VideoWriter_fourcc(*'mp4v'), FPS, (WIDTH, HEIGHT))
+                    log_file = open(log_filename, mode='w', newline='')
+                    log_writer = csv.writer(log_file)
+                    log_writer.writerow(["Frame", "Timestamp", "Piezone", "InCenter"])
+
+            success, bbox = tracker.update(frame)
+            if success:
+                x, y, w, h = map(int, bbox)
+                cx, cy = x + w // 2, y + h // 2
+                zone = determine_piezone(cx, cy)
+                center = in_center(cx, cy)
+                print(f"Object in piezone {zone}" + (" and centerzone" if center else ""))
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
+                cv2.putText(frame, f"Zone {zone}" + (" + Center" if center else ""), (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+
+                if last_position and (cx, cy) == last_position:
+                    if time.time() - stationary_start > STATIONARY_THRESHOLD:
+                        tracking = False
+                        tracker = None
+                        print("Object stationary too long. Reinitializing tracker.")
+                else:
+                    stationary_start = time.time()
+                last_position = (cx, cy)
+
+                if video_writer:
+                    video_writer.write(frame)
+                if log_writer:
+                    log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center])
+            else:
+                tracking = False
+                tracker = None
+                print("Tracking lost. Reinitializing...")
+
+        cv2.imshow("Tracking", frame)
+        key = cv2.waitKey(1) & 0xFF
+
+        if key == ord('q'):
+            break
+        elif key == ord('m'):
+            paused = True
+            print("Paused tracking and recording.")
+            if video_writer:
+                video_writer.release()
+                video_writer = None
+            if log_file:
+                log_file.close()
+                log_file = None
+        elif key == ord('c') and paused:
+            paused = False
+            session_number += 1
+            tracking = False
+            tracker = None
+            print("Resumed tracking and recording.")
+
+        previous_frame = frame.copy()
+
+    if video_writer:
+        video_writer.release()
+    if log_file:
+        log_file.close()
+    cv2.destroyAllWindows()
+    picam2.stop()
+
+if __name__ == "__main__":
+    main()
