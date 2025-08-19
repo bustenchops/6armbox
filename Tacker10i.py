@@ -7,7 +7,7 @@ import numpy as np
 from picamera2 import Picamera2
 
 # Frame dimensions
-WIDTH, HEIGHT = 1920, 1080
+WIDTH, HEIGHT = 640, 480
 
 def initialize_camera(resolution=(WIDTH, HEIGHT), fmt="BGR888"):
     picam2 = Picamera2()
@@ -19,31 +19,25 @@ def initialize_camera(resolution=(WIDTH, HEIGHT), fmt="BGR888"):
     time.sleep(2)  # Let exposure & white balance settle
     return picam2
 
-def find_moving_object_bbox(current_frame, previous_frame, min_area=2000):
+def find_moving_object_bbox(current_frame, previous_frame):
     gray_current = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
     gray_previous = cv2.cvtColor(previous_frame, cv2.COLOR_BGR2GRAY)
 
     frame_diff = cv2.absdiff(gray_previous, gray_current)
     blurred = cv2.GaussianBlur(frame_diff, (5, 5), 0)
-    _, thresh = cv2.threshold(blurred, 25, 255, cv2.THRESH_BINARY)
 
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    moving_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > min_area]
+    # Find the point of highest contrast
+    _, _, _, max_loc = cv2.minMaxLoc(blurred)
+    cx, cy = max_loc
 
-    if not moving_contours:
-        return None
+    # Define a fixed-size bounding box (50x50) centered on the highest contrast point
+    half_size = 25
+    x = max(0, cx - half_size)
+    y = max(0, cy - half_size)
+    x = min(x, WIDTH - 50)
+    y = min(y, HEIGHT - 50)
 
-    moving_object = max(moving_contours, key=cv2.contourArea)
-    moments = cv2.moments(moving_object)
-
-    if moments["m00"] == 0:
-        return None
-
-    cx = int(moments["m10"] / moments["m00"])
-    cy = int(moments["m01"] / moments["m00"])
-
-    x, y, w, h = cv2.boundingRect(moving_object)
-    return (x, y, w, h)
+    return (x, y, 50, 50)
 
 def create_kcf_tracker():
     try:
@@ -65,6 +59,7 @@ def main():
     previous_frame = picam2.capture_array()
     bbox = None
 
+    # Wait until motion is detected
     while bbox is None:
         current_frame = picam2.capture_array()
         bbox = find_moving_object_bbox(current_frame, previous_frame)
