@@ -19,9 +19,11 @@ date_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
 # Initialize camera
 picam2 = Picamera2()
-picam2.preview_configuration.main.size = (video_width, video_height)
-picam2.preview_configuration.main.format = "RGB"
-picam2.preview_configuration.controls.FrameRate = fps
+# picam2.preview_configuration.main.size = (video_width, video_height)
+# picam2.preview_configuration.main.format = "RGB"
+# picam2.preview_configuration.controls.FrameRate = fps
+cfg = picam2.create_preview_configuration(main={"format": "BGR888", "size": (video_width, video_height), "FrameRate": fps})
+picam2.configure(cfg)
 picam2.configure("preview")
 picam2.start()
 
