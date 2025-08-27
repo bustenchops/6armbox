@@ -18,6 +18,7 @@ simulated_gpio_15 = False
 def toggle_gpio_simulation():
     global simulated_gpio_15
     while True:
+        print('waiting for simulation key press')
         key = cv2.waitKey(1) & 0xFF
         if key == ord('t'):
             simulated_gpio_15 = not simulated_gpio_15
