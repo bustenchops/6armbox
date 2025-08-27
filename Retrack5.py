@@ -37,7 +37,7 @@ GPIO.setup(LEDpin,GPIO.out,initial = 0)
 
 LEDstate = 0
 
-def signalsend(zonenumber)
+def signalsend(zonenumber):
     if zonenumber == 1:
         GPIO.output(Cam1pin, 1)
         GPIO.output(Cam2pin, 0)
