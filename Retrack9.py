@@ -46,6 +46,7 @@ fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(video_filename, fourcc, fps, (video_width, video_height))
 
 log_file = open(log_filename, mode='w', newline='')
+log_file = open(log_filename, mode='w', newline='')
 log_writer = csv.writer(log_file)
 log_writer.writerow(["Frame", "Timestamp", "Piezone", "Centerzone", "Tracking", "FPS"])
 
