@@ -1,31 +1,48 @@
 
 import RPi.GPIO as GPIO
-import keyboard
 import time
+import threading
+import sys
+import termios
+import tty
 
-# Setup
+# Setup GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(2, GPIO.OUT)
 
-# Initial state
-pin_state = False
-GPIO.output(2, pin_state)
-print("GPIO 2 is OFF")
+# Function to read a single character from stdin
+def get_char():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
 
-try:
-    print("Press SPACE to toggle GPIO 2. Press 'q' to quit.")
-    while True:
-        if keyboard.is_pressed(' '):
-            pin_state = not pin_state
-            GPIO.output(2, pin_state)
-            print(f"GPIO 2 is {'ON' if pin_state else 'OFF'}")
-            time.sleep(0.3)  # Debounce delay
+# Thread to monitor for 'q' key press
+def monitor_keypress(stop_event):
+    while not stop_event.is_set():
+        if get_char().lower() == 'q':
+            stop_event.set()
 
-        elif keyboard.is_pressed('q'):
-            print("Exiting program.")
-            break
+# Main loop
+def main():
+    stop_event = threading.Event()
+    key_thread = threading.Thread(target=monitor_keypress, args=(stop_event,))
+    key_thread.start()
 
-        time.sleep(0.05)  # Reduce CPU usage
+    print("Press 'q' to quit.")
+    try:
+        while not stop_event.is_set():
+            GPIO.output(2, GPIO.HIGH)
+            time.sleep(3)
+            GPIO.output(2, GPIO.LOW)
+            time.sleep(3)
+    finally:
+        GPIO.cleanup()
+        print("GPIO cleaned up. Exiting.")
 
-finally:
-    GPIO.cleanup()
+if __name__ == "__main__":
+    main()
