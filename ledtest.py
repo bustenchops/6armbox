@@ -37,8 +37,10 @@ def main():
     try:
         while not stop_event.is_set():
             GPIO.output(2, GPIO.HIGH)
+            print("GPIO 2 is ON")
             time.sleep(3)
             GPIO.output(2, GPIO.LOW)
+            print("GPIO 2 is OFF")
             time.sleep(3)
     finally:
         GPIO.cleanup()
