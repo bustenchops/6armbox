@@ -43,6 +43,7 @@ def main():
             print("GPIO 2 is OFF")
             time.sleep(3)
     finally:
+        GPIO.output(2, GPIO.LOW)
         GPIO.cleanup()
         print("GPIO cleaned up. Exiting.")
 
