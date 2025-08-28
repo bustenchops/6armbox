@@ -19,6 +19,7 @@ STATIONARY_THRESHOLD = 3.0
 MIN_AREA = 500
 NO_TRACKING_MARGIN = 80
 LED_PIN = 2
+FLASHDURATION = 2
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
@@ -32,9 +33,9 @@ def led_flashing():
     global led_thread_running
     while led_thread_running:
         GPIO.output(LED_PIN, GPIO.HIGH)
-        time.sleep(2)
+        time.sleep(FLASHDURATION)
         GPIO.output(LED_PIN, GPIO.LOW)
-        time.sleep(2)
+        time.sleep(FLASHDURATION)
 
 def start_led_thread():
     global led_thread, led_thread_running
