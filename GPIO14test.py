@@ -7,8 +7,10 @@ import termios
 import tty
 
 # Setup GPIO
+
+GPIOpin = 14
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(14, GPIO.OUT)
+GPIO.setup(GPIOpin, GPIO.OUT)
 
 # Function to read a single character from stdin
 def get_char():
@@ -36,14 +38,14 @@ def main():
     print("Press 'q' to quit.")
     try:
         while not stop_event.is_set():
-            GPIO.output(2, GPIO.HIGH)
-            print("GPIO 2 is ON")
+            GPIO.output(GPIOpin, GPIO.HIGH)
+            print(GPIOpin , " is ON")
             time.sleep(3)
-            GPIO.output(2, GPIO.LOW)
-            print("GPIO 2 is OFF")
+            GPIO.output(GPIOpin, GPIO.LOW)
+            print(GPIOpin, " is OFF")
             time.sleep(3)
     finally:
-        GPIO.output(2, GPIO.LOW)
+        GPIO.output(GPIOpin, GPIO.LOW)
         GPIO.cleanup()
         print("GPIO cleaned up. Exiting.")
 
