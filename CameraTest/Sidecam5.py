@@ -56,7 +56,7 @@ try:
                 log_writer.writerow(["OFF", off_time.strftime('%Y-%m-%d %H:%M:%S')])
             recording = False
 
-        time.sleep(0.1)
+        time.sleep(0.03)
 
 except KeyboardInterrupt:
     print("Exiting program")
