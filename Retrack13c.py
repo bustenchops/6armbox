@@ -167,7 +167,6 @@ def main():
 
         cv2.putText(frame, f"FPS: {fps:.2f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
         cv2.imshow("Tracking", frame)
-
         key = cv2.waitKey(1) & 0xFF
 
         if key == ord('q'):
