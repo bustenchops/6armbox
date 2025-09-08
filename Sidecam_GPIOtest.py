@@ -15,16 +15,13 @@ GPIO.output(14, GPIO.HIGH)
 
 try:
     while True:
-        # Flash LED on GPIO 18
-        GPIO.output(18, GPIO.HIGH)
-        time.sleep(0.5)
-        GPIO.output(18, GPIO.LOW)
-        time.sleep(0.5)
-
         # Read and report status of GPIO 15
         input_state = GPIO.input(15)
         print(f"GPIO 15 state: {'HIGH' if input_state else 'LOW'}")
-
+        if input_state:
+            GPIO.output(18, GPIO.HIGH)
+        else:
+            GPIO.output(10, GPIO.LOW)
 except KeyboardInterrupt:
     print("Program interrupted by user.")
 
