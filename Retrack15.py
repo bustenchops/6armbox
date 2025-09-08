@@ -205,6 +205,7 @@ def main():
                     GPIO.output(cam5,GPIO.LOW)
                     GPIO.output(cam6,GPIO.LOW)
                     cameratriggered = 0
+                    print('no camera on')
                 else:
                     if zone == 1:
                         GPIO.output(cam1, GPIO.HIGH)
@@ -214,6 +215,7 @@ def main():
                         GPIO.output(cam5, GPIO.LOW)
                         GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 1
+                        print('GPIO ', cam1, ' triggered')
                     if zone == 2:
                         GPIO.output(cam1, GPIO.LOW)
                         GPIO.output(cam2, GPIO.HIGH)
@@ -222,6 +224,7 @@ def main():
                         GPIO.output(cam5, GPIO.LOW)
                         GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 2
+                        print('GPIO ', cam2, ' triggered')
                     if zone == 3:
                         GPIO.output(cam1, GPIO.LOW)
                         GPIO.output(cam2, GPIO.LOW)
@@ -230,6 +233,7 @@ def main():
                         GPIO.output(cam5, GPIO.LOW)
                         GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 3
+                        print('GPIO ', cam3, ' triggered')
                     if zone == 4:
                         GPIO.output(cam1, GPIO.LOW)
                         GPIO.output(cam2, GPIO.LOW)
@@ -238,6 +242,7 @@ def main():
                         GPIO.output(cam5, GPIO.LOW)
                         GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 4
+                        print('GPIO ', cam4, ' triggered')
                     if zone == 5:
                         GPIO.output(cam1, GPIO.LOW)
                         GPIO.output(cam2, GPIO.LOW)
@@ -246,6 +251,7 @@ def main():
                         GPIO.output(cam5, GPIO.HIGH)
                         GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 5
+                        print('GPIO ', cam5, ' triggered')
                     if zone == 6:
                         GPIO.output(cam1, GPIO.LOW)
                         GPIO.output(cam2, GPIO.LOW)
@@ -254,6 +260,7 @@ def main():
                         GPIO.output(cam5, GPIO.LOW)
                         GPIO.output(cam6, GPIO.HIGH)
                         cameratriggered = 6
+                        print('GPIO ', cam6, ' triggered')
 
 
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
