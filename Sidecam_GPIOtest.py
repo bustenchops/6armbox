@@ -21,7 +21,7 @@ try:
         if input_state:
             GPIO.output(18, GPIO.HIGH)
         else:
-            GPIO.output(10, GPIO.LOW)
+            GPIO.output(18, GPIO.LOW)
 except KeyboardInterrupt:
     print("Program interrupted by user.")
 
