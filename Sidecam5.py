@@ -1,7 +1,7 @@
 
 import RPi.GPIO as GPIO
 from picamera2 import Picamera2
-from picamera2.encoders import H264Encoder
+from picamera2.encoders import MJPEGEncoder
 from datetime import datetime
 import time
 import csv
@@ -23,7 +23,7 @@ camera = Picamera2()
 camera_config = camera.create_video_configuration(main={'size': (1920, 1080), 'format': 'YUV420'})
 camera.configure(camera_config)
 camera.framerate = 24
-encoder = H264Encoder(bitrate=10000000)  # 10 Mbps
+encoder = MJPEGEncoder()
 
 # Create log file with current date
 log_filename = f"log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
@@ -42,7 +42,7 @@ try:
         if input_state == GPIO.HIGH and not recording:
             on_time = datetime.now()
             GPIO.output(18, GPIO.HIGH)
-            video_filename = f"video_{on_time.strftime('%Y-%m-%d_%H-%M-%S')}.mp4"
+            video_filename = f"video_{on_time.strftime('%Y-%m-%d_%H-%M-%S')}.avi"
             camera.start_recording(encoder, output=video_filename)
             with open(log_filename, "a", newline='') as log_file:
                 log_writer = csv.writer(log_file)
