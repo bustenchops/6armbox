@@ -22,6 +22,7 @@ camera = Picamera2()
 camera_config = camera.create_video_configuration(main={'size': (1920, 1080), 'format': 'XRGB8888'})
 camera.configure(camera_config)
 camera.framerate = 24
+encoder = camera.encoder("libx264", bitrate=10000000)
 
 # Create log file with current date
 log_filename = f"log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
@@ -41,7 +42,7 @@ try:
             on_time = datetime.now()
             GPIO.output(18, GPIO.HIGH)
             video_filename = f"video_{on_time.strftime('%Y-%m-%d_%H-%M-%S')}.mp4"
-            camera.start_recording(output=video_filename)
+            camera.start_recording(encoder, output=video_filename)
             with open(log_filename, "a", newline='') as log_file:
                 log_writer = csv.writer(log_file)
                 log_writer.writerow(["ON", on_time.strftime('%Y-%m-%d %H:%M:%S')])

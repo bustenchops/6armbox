@@ -40,6 +40,7 @@ video_config = camera.create_video_configuration(
 )
 camera.configure(video_config)
 camera.framerate = 24
+encoder = camera.encoder("libx264", bitrate=10000000)
 
 def log_event(state: str, timestamp: datetime):
     """Append an ON/OFF event to the CSV log."""
@@ -53,7 +54,6 @@ def start_record(timestamp: datetime):
     GPIO.output(RECORD_LED_PIN, GPIO.HIGH)
     filename = f"video_{on_time:%Y-%m-%d_%H-%M-%S}.mp4"
     try:
-        encoder = camera.encoder("libx264", bitrate=10000000)
         camera.start_recording(encoder, output=filename)
         log_event("ON", on_time)
         recording = True
