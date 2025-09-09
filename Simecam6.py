@@ -53,7 +53,8 @@ def start_record(timestamp: datetime):
     GPIO.output(RECORD_LED_PIN, GPIO.HIGH)
     filename = f"video_{on_time:%Y-%m-%d_%H-%M-%S}.mp4"
     try:
-        camera.start_recording(output=filename)
+        encoder = camera.encoder("libx264", bitrate=10000000)
+        camera.start_recording(encoder, output=filename)
         log_event("ON", on_time)
         recording = True
         print(f"Recording started: {filename}")
