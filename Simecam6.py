@@ -1,7 +1,7 @@
 
 import RPi.GPIO as GPIO
 from picamera2 import Picamera2
-from picamera2.encoders import MJPEGEncoder
+from picamera2.encoders import H264Encoder
 from datetime import datetime
 import time
 import csv
@@ -37,11 +37,11 @@ GPIO.output(RECORD_LED_PIN, GPIO.LOW)
 # Initialize camera
 camera = Picamera2()
 video_config = camera.create_video_configuration(
-    main={'size': (1920, 1080), 'format': 'YUV420'}
+    main={'size': (1920, 1080)}
 )
 camera.configure(video_config)
-camera.framerate = 24
-encoder = MJPEGEncoder()
+camera.framerate = 25
+encoder = H264Encoder(bitrate=3000000)
 
 def log_event(state: str, timestamp: datetime):
     """Append an ON/OFF event to the CSV log."""
@@ -53,7 +53,7 @@ def start_record(timestamp: datetime):
     global recording, on_time
     on_time = timestamp
     GPIO.output(RECORD_LED_PIN, GPIO.HIGH)
-    filename = f"video_{on_time:%Y-%m-%d_%H-%M-%S}.avi"
+    filename = f"video_{on_time:%Y-%m-%d_%H-%M-%S}.h264"
     try:
         camera.start_recording(encoder, output=filename)
         log_event("ON", on_time)
