@@ -1,6 +1,5 @@
 
 import RPi.GPIO as GPIO
-from openpyxl.styles.builtins import output
 from picamera2 import Picamera2
 from datetime import datetime
 import time
@@ -25,7 +24,7 @@ camera.configure(camera_config)
 camera.framerate = 24
 
 # Create log file with current date
-log_filename = f"log_{datetime.now().strftime('%Y-%m-%d')}.csv"
+log_filename = f"log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
 with open(log_filename, "w", newline='') as log_file:
     log_writer = csv.writer(log_file)
     log_writer.writerow(["LED State", "Timestamp"])
