@@ -1,6 +1,7 @@
 
 import RPi.GPIO as GPIO
 from picamera2 import Picamera2
+from picamera2.encoders import H264Encoder
 from datetime import datetime
 import time
 import csv
@@ -22,7 +23,7 @@ camera = Picamera2()
 camera_config = camera.create_video_configuration(main={'size': (1920, 1080), 'format': 'XRGB8888'})
 camera.configure(camera_config)
 camera.framerate = 24
-encoder = camera.encoder("libx264", bitrate=10000000)
+encoder = H264Encoder(bitrate=10000000)  # 10 Mbps
 
 # Create log file with current date
 log_filename = f"log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"

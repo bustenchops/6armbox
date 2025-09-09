@@ -1,6 +1,7 @@
 
 import RPi.GPIO as GPIO
 from picamera2 import Picamera2
+from picamera2.encoders import H264Encoder
 from datetime import datetime
 import time
 import csv
@@ -40,7 +41,7 @@ video_config = camera.create_video_configuration(
 )
 camera.configure(video_config)
 camera.framerate = 24
-encoder = camera.encoder("libx264", bitrate=10000000)
+encoder = H264Encoder(bitrate=10000000)  # 10 Mbps
 
 def log_event(state: str, timestamp: datetime):
     """Append an ON/OFF event to the CSV log."""
