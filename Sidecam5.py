@@ -20,7 +20,7 @@ GPIO.output(18, GPIO.LOW)
 
 # Initialize camera
 camera = Picamera2()
-camera_config = camera.create_video_configuration(main={'size': (1920, 1080), 'format': 'XRGB8888'})
+camera_config = camera.create_video_configuration(main={'size': (1920, 1080), 'format': 'YUV420'})
 camera.configure(camera_config)
 camera.framerate = 24
 encoder = H264Encoder(bitrate=10000000)  # 10 Mbps
@@ -64,5 +64,6 @@ except KeyboardInterrupt:
     print("Exiting program")
 
 finally:
+    camera.stop_recording()
     camera.close()
     GPIO.cleanup()

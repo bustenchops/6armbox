@@ -37,7 +37,7 @@ GPIO.output(RECORD_LED_PIN, GPIO.LOW)
 # Initialize camera
 camera = Picamera2()
 video_config = camera.create_video_configuration(
-    main={'size': (1920, 1080), 'format': 'XRGB8888'}
+    main={'size': (1920, 1080), 'format': 'YUV420'}
 )
 camera.configure(video_config)
 camera.framerate = 24
@@ -96,5 +96,6 @@ except KeyboardInterrupt:
     print("\nInterrupted by user; exiting.")
 
 finally:
+    camera.stop_recording()
     camera.close()
     GPIO.cleanup()
