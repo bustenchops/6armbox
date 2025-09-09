@@ -16,7 +16,7 @@ recording = False
 on_time   = None
 
 # Prepare CSV log
-log_filename = f"log_{datetime.now():%Y-%m-%d}.csv"
+log_filename = f"log_{datetime.now():%Y-%m-%d_%H-%M-%S}.csv"
 file_exists = os.path.exists(log_filename)
 with open(log_filename, "a", newline='') as log_file:
     writer = csv.writer(log_file)
