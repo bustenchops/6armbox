@@ -1,5 +1,6 @@
 
 import RPi.GPIO as GPIO
+from openpyxl.styles.builtins import output
 from picamera2 import Picamera2
 from datetime import datetime
 import time
@@ -41,7 +42,7 @@ try:
             on_time = datetime.now()
             GPIO.output(18, GPIO.HIGH)
             video_filename = f"video_{on_time.strftime('%Y-%m-%d_%H-%M-%S')}.mp4"
-            camera.start_recording(video_filename)
+            camera.start_recording(output=video_filename)
             with open(log_filename, "a", newline='') as log_file:
                 log_writer = csv.writer(log_file)
                 log_writer.writerow(["ON", on_time.strftime('%Y-%m-%d %H:%M:%S')])
