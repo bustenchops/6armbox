@@ -41,19 +41,19 @@ video_config = camera.create_video_configuration(
 )
 camera.configure(video_config)
 camera.framerate = 25
-encoder = H264Encoder(bitrate=3000000)
+encoder = H264Encoder(bitrate=10000000)
 
 def log_event(state: str, timestamp: datetime):
     """Append an ON/OFF event to the CSV log."""
     with open(log_filename, "a", newline='') as log_file:
-        csv.writer(log_file).writerow([state, timestamp.strftime('%Y-%m-%d %H:%M:%S')])
+        csv.writer(log_file).writerow([state, timestamp.strftime('%Y-%m-%d %H_%M_%S.%f')])
 
 def start_record(timestamp: datetime):
     """Start recording."""
     global recording, on_time
     on_time = timestamp
     GPIO.output(RECORD_LED_PIN, GPIO.HIGH)
-    filename = f"video_{on_time:%Y-%m-%d_%H-%M-%S}.h264"
+    filename = f"video_{on_time:%Y-%m-%d_%H-%M-%S.%f}.h264"
     try:
         camera.start_recording(encoder, output=filename)
         log_event("ON", on_time)
@@ -70,7 +70,7 @@ def stop_record(timestamp: datetime):
         GPIO.output(RECORD_LED_PIN, GPIO.LOW)
         log_event("OFF", timestamp)
         recording = False
-        print(f"Recording stopped at {timestamp:%Y-%m-%d %H:%M:%S}")
+        print(f"Recording stopped at {timestamp:%Y-%m-%d %H:%M:%S.%f}")
     except Exception as e:
         print(f"Error stopping recording: {e}")
 

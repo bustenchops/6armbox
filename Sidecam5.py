@@ -20,13 +20,13 @@ GPIO.output(18, GPIO.LOW)
 
 # Initialize camera
 camera = Picamera2()
-camera_config = camera.create_video_configuration(main={'size': (1920, 1080), 'format': 'YUV420'})
+camera_config = camera.create_video_configuration(main={'size': (1920, 1080)})
 camera.configure(camera_config)
 camera.framerate = 24
-encoder = H264Encoder(bitrate=3000000)
+encoder = H264Encoder(bitrate=10000000)
 
 # Create log file with current date
-log_filename = f"log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
+log_filename = f"log_{datetime.now().strftime('%Y-%m-%d %H_%M_%S.%f')}.csv"
 with open(log_filename, "w", newline='') as log_file:
     log_writer = csv.writer(log_file)
     log_writer.writerow(["LED State", "Timestamp"])
@@ -42,11 +42,11 @@ try:
         if input_state == GPIO.HIGH and not recording:
             on_time = datetime.now()
             GPIO.output(18, GPIO.HIGH)
-            video_filename = f"video_{on_time.strftime('%Y-%m-%d_%H-%M-%S')}.h264"
+            video_filename = f"video_{on_time.strftime('%Y-%m-%d %H_%M_%S.%f')}.h264"
             camera.start_recording(encoder, output=video_filename)
             with open(log_filename, "a", newline='') as log_file:
                 log_writer = csv.writer(log_file)
-                log_writer.writerow(["ON", on_time.strftime('%Y-%m-%d %H:%M:%S')])
+                log_writer.writerow(["ON", on_time.strftime('%Y-%m-%d %H_%M_%S.%f')])
             recording = True
 
         elif input_state == GPIO.LOW and recording:
@@ -55,7 +55,7 @@ try:
             GPIO.output(18, GPIO.LOW)
             with open(log_filename, "a", newline='') as log_file:
                 log_writer = csv.writer(log_file)
-                log_writer.writerow(["OFF", off_time.strftime('%Y-%m-%d %H:%M:%S')])
+                log_writer.writerow(["OFF", off_time.strftime('%Y-%m-%d %H_%M_%S.%f')])
             recording = False
 
         time.sleep(0.03)
