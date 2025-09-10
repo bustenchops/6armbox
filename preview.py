@@ -1,24 +1,23 @@
-from picamera2 import Picamera2
-import cv2
+from picamera2 import Picamera2, Preview
+import time
 
 # Initialize the camera
 picam2 = Picamera2()
-picam2.configure(picam2.preview_configuration(main={"format": "RGB888", "size": (1920, 1080)}))
+
+# Configure for preview
+config = picam2.preview_configuration(main={"format": "RGB888", "size": (640, 480)})
+picam2.configure(config)
+
+# Start the preview using the built-in DRM window
+picam2.start_preview(Preview.QTGL)  # You can also try Preview.DRM or Preview.NULL depending on your setup
 picam2.start()
 
-print("Press 'q' to quit.")
+print("Live video feed started. Press Ctrl+C to quit.")
 
-while True:
-    # Capture a frame
-    frame = picam2.capture_array()
-
-    # Display the frame
-    cv2.imshow("Camera Preview", frame)
-
-    # Exit on 'q' key press
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# Clean up
-cv2.destroyAllWindows()
-picam2.stop()
+try:
+    while True:
+        time.sleep(0.1)  # Keep the program alive
+except KeyboardInterrupt:
+    print("\nStopping camera...")
+    picam2.stop_preview()
+    picam2.stop()
