@@ -26,6 +26,7 @@ cam3 = 18
 cam4 = 23
 cam5 = 24
 cam6 = 25
+lens_pos = 0
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
@@ -73,6 +74,10 @@ def initialize_camera():
     picam2 = Picamera2()
     cfg = picam2.create_preview_configuration(main={"format": "BGR888", "size": (WIDTH, HEIGHT)})
     picam2.configure(cfg)
+    picam2.set_controls({
+        "AfMode": 0,
+        "LensPosition": lens_pos
+    })
     picam2.start()
     time.sleep(2)
     return picam2
