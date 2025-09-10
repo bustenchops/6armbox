@@ -1,23 +1,35 @@
-from picamera2 import Picamera2, Preview
-import time
+from picamera2 import Picamera2
+import pygame
+import numpy as np
 
-# Initialize the camera
+# Initialize camera
 picam2 = Picamera2()
-
-# Configure for preview
 config = picam2.preview_configuration(main={"format": "RGB888", "size": (640, 480)})
 picam2.configure(config)
-
-# Start the preview using the built-in DRM window
-picam2.start_preview(Preview.QTGL)  # You can also try Preview.DRM or Preview.NULL depending on your setup
 picam2.start()
 
-print("Live video feed started. Press Ctrl+C to quit.")
+# Initialize pygame window
+pygame.init()
+screen = pygame.display.set_mode((640, 480))
+pygame.display.set_caption("Live Camera Feed")
 
-try:
-    while True:
-        time.sleep(0.1)  # Keep the program alive
-except KeyboardInterrupt:
-    print("\nStopping camera...")
-    picam2.stop_preview()
-    picam2.stop()
+running = True
+while running:
+    # Capture frame
+    frame = picam2.capture_array()
+
+    # Convert to pygame surface
+    frame_surface = pygame.surfarray.make_surface(np.rot90(frame))
+
+    # Display frame
+    screen.blit(frame_surface, (0, 0))
+    pygame.display.update()
+
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+# Cleanup
+pygame.quit()
+picam2.stop()
