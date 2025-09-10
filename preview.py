@@ -14,7 +14,7 @@ picam2.start()
 preview_folder = "previewpics"
 os.makedirs(preview_folder, exist_ok=True)
 
-print("📸 Ready to capture. Press 'P' to take a photo and upload. Press 'Q' to quit.")
+print("Ready to capture. Press 'P' to take a photo and upload. Press 'Q' to quit.")
 
 try:
     while True:
@@ -26,22 +26,22 @@ try:
 
             # Capture and save image
             picam2.capture_file(filepath)
-            print(f"✅ Photo saved: {filename}")
+            print(f"Photo saved: {filename}")
 
             # Upload using rclone
-            print("⏫ Uploading to OneDrive...")
+            print("Uploading to OneDrive...")
             os.system(f'rclone copy "{preview_folder}" onedrive:/Videos')
 
             # Delete the file after upload
             os.remove(filepath)
-            print(f"🗑️ Deleted local copy: {filename}")
+            print(f"Deleted local copy: {filename}")
 
             # Wait for key release to avoid multiple triggers
             while keyboard.is_pressed('p'):
                 time.sleep(0.1)
 
         elif keyboard.is_pressed('q'):
-            print("👋 Quitting...")
+            print("Quitting...")
             break
 
         time.sleep(0.1)
