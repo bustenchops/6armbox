@@ -1,53 +1,32 @@
-import os
-import time
-from datetime import datetime
 from picamera2 import Picamera2
-import keyboard  # Requires sudo privileges on Raspberry Pi
+import time
 
-# Initialize camera
-picam2 = Picamera2()
-config = picam2.create_still_configuration(main={"format": "RGB888", "size": (640, 480)})
-picam2.configure(config)
-picam2.start()
+def test_manual_focus():
+    # Initialize Picamera2 and configure for still capture
+    picam2 = Picamera2()
+    config = picam2.create_still_configuration()
+    picam2.configure(config)
+    picam2.start()
 
-# Ensure previewpics folder exists
-preview_folder = "previewpics"
-os.makedirs(preview_folder, exist_ok=True)
+    try:
+        # Loop through lens positions 0–15 with manual focus
+        for lens_pos in range(16):
+            # Set autofocus mode to manual (0) and lens position
+            picam2.set_controls({
+                "AfMode": 0,
+                "LensPosition": lens_pos
+            })
 
-print("Ready to capture. Press 'P' to take a photo and upload. Press 'Q' to quit.")
+            # Give the lens time to settle
+            time.sleep(0.5)
 
-try:
-    while True:
-        if keyboard.is_pressed('p'):
-            # Generate timestamped filename
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"{timestamp}.jpg"
-            filepath = os.path.join(preview_folder, filename)
+            # Capture and save the still image
+            filename = f"focus_test-lensposition{lens_pos}.jpg"
+            picam2.capture_file(filename)
+            print(f"Captured {filename}")
 
-            # Capture and save image
-            picam2.capture_file(filepath)
-            print(f"Photo saved: {filename}")
+    finally:
+        picam2.stop()
 
-            # Upload using rclone
-            print("Uploading to OneDrive...")
-            os.system(f'rclone copy "{preview_folder}" onedrive:/Videos')
-
-            # Delete the file after upload
-            os.remove(filepath)
-            print(f"Deleted local copy: {filename}")
-
-            # Wait for key release to avoid multiple triggers
-            while keyboard.is_pressed('p'):
-                time.sleep(0.1)
-
-        elif keyboard.is_pressed('q'):
-            print("Quitting...")
-            break
-
-        time.sleep(0.1)
-
-except KeyboardInterrupt:
-    print("\nInterrupted. Exiting...")
-
-finally:
-    picam2.stop()
+if __name__ == "__main__":
+    test_manual_focus()
