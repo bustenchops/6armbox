@@ -16,6 +16,8 @@ RECORD_LED_PIN   = 18
 recording = False
 on_time   = None
 
+lens_pos = 6
+
 # Prepare CSV log
 log_filename = f"log_{datetime.now():%Y-%m-%d_%H-%M-%S}.csv"
 file_exists = os.path.exists(log_filename)
@@ -41,6 +43,10 @@ video_config = camera.create_video_configuration(
 )
 camera.configure(video_config)
 camera.framerate = 25
+camera.set_controls({
+    "AfMode": 0,
+    "LensPosition": lens_pos
+})
 encoder = H264Encoder(bitrate=10000000)
 
 def log_event(state: str, timestamp: datetime):

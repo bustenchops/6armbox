@@ -16,7 +16,7 @@ FPS = 24
 HEX_RADIUS = 225
 CENTER_RADIUS = 70
 STATIONARY_THRESHOLD = 3.0
-MIN_AREA = 200
+MIN_AREA = 150
 NO_TRACKING_MARGIN = 100
 LED_PIN = 2
 FLASHDURATION = 2
@@ -213,7 +213,7 @@ def main():
                     print('no camera on')
                 else:
                     if zone == 1:
-                        GPIO.output(cam1, GPIO.HIGH)
+                        GPIO.output(cam1, GPIO.LOW) # normally high in 6 arm box
                         GPIO.output(cam2, GPIO.LOW)
                         GPIO.output(cam3, GPIO.LOW)
                         GPIO.output(cam4, GPIO.LOW)
@@ -249,7 +249,7 @@ def main():
                         cameratriggered = 4
                         print('GPIO ', cam4, ' triggered')
                     if zone == 5:
-                        GPIO.output(cam1, GPIO.LOW)
+                        GPIO.output(cam1, GPIO.HIGH) #for 2 arms...normally low for 6 arm
                         GPIO.output(cam2, GPIO.LOW)
                         GPIO.output(cam3, GPIO.LOW)
                         GPIO.output(cam4, GPIO.LOW)
