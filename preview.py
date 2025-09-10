@@ -1,35 +1,53 @@
+import os
+import time
+from datetime import datetime
 from picamera2 import Picamera2
-import pygame
-import numpy as np
+import keyboard  # Requires sudo privileges on Raspberry Pi
 
 # Initialize camera
 picam2 = Picamera2()
-config = picam2.preview_configuration(main={"format": "RGB888", "size": (640, 480)})
+config = picam2.create_still_configuration(main={"format": "RGB888", "size": (640, 480)})
 picam2.configure(config)
 picam2.start()
 
-# Initialize pygame window
-pygame.init()
-screen = pygame.display.set_mode((640, 480))
-pygame.display.set_caption("Live Camera Feed")
+# Ensure previewpics folder exists
+preview_folder = "previewpics"
+os.makedirs(preview_folder, exist_ok=True)
 
-running = True
-while running:
-    # Capture frame
-    frame = picam2.capture_array()
+print("📸 Ready to capture. Press 'P' to take a photo and upload. Press 'Q' to quit.")
 
-    # Convert to pygame surface
-    frame_surface = pygame.surfarray.make_surface(np.rot90(frame))
+try:
+    while True:
+        if keyboard.is_pressed('p'):
+            # Generate timestamped filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{timestamp}.jpg"
+            filepath = os.path.join(preview_folder, filename)
 
-    # Display frame
-    screen.blit(frame_surface, (0, 0))
-    pygame.display.update()
+            # Capture and save image
+            picam2.capture_file(filepath)
+            print(f"✅ Photo saved: {filename}")
 
-    # Event handling
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+            # Upload using rclone
+            print("⏫ Uploading to OneDrive...")
+            os.system(f'rclone copy "{preview_folder}" onedrive:/Videos')
 
-# Cleanup
-pygame.quit()
-picam2.stop()
+            # Delete the file after upload
+            os.remove(filepath)
+            print(f"🗑️ Deleted local copy: {filename}")
+
+            # Wait for key release to avoid multiple triggers
+            while keyboard.is_pressed('p'):
+                time.sleep(0.1)
+
+        elif keyboard.is_pressed('q'):
+            print("👋 Quitting...")
+            break
+
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    print("\nInterrupted. Exiting...")
+
+finally:
+    picam2.stop()
