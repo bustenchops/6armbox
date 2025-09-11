@@ -28,7 +28,7 @@ for ext in file_extensions:
         src_path = os.path.join(source_folder, file)
         dst_path = os.path.join(target_folder, file)
         shutil.move(src_path, dst_path)
-        print(f"Moved: {file} → {target_folder}")
+        print(f"Moved: {file} to {target_folder}")
 
 # Step 3: Use rclone to copy /videos to /media/6armbox/
 try:
