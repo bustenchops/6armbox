@@ -4,7 +4,7 @@ import datetime
 import subprocess
 
 # Configuration
-source_folder = "~/6armbox"  # Replace with your actual source folder
+source_folder = ""  # Replace with your actual source folder
 videos_root = "./videos"
 backup_target = "/media/6armboxDATA"
 
