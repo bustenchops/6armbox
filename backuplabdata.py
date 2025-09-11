@@ -5,7 +5,7 @@ import subprocess
 
 # Configuration
 source_folder = "~/6armbox"  # Replace with your actual source folder
-videos_root = "/videos"
+videos_root = "./videos"
 backup_target = "/media/6armboxDATA"
 
 # Step 1: Create date-named folder if it doesn't exist
