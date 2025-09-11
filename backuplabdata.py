@@ -14,9 +14,9 @@ target_folder = os.path.join(videos_root, today)
 
 if not os.path.exists(target_folder):
     os.makedirs(target_folder)
-    print(f"📁 Created folder: {target_folder}")
+    print(f"Created folder: {target_folder}")
 else:
-    print(f"📁 Folder already exists: {target_folder}")
+    print(f"Folder already exists: {target_folder}")
 
 # Step 2: Move specified file types
 file_extensions = [".csv", ".jpg", ".h264", ".mp4"]
@@ -33,6 +33,6 @@ for ext in file_extensions:
 # Step 3: Use rclone to copy /videos to /media/6armbox/
 try:
     subprocess.run(["rclone", "copy", videos_root, backup_target], check=True)
-    print("✅ rclone copy completed successfully.")
+    print("rclone copy completed successfully.")
 except subprocess.CalledProcessError as e:
-    print(f"⚠️ rclone failed: {e}")
+    print(f"rclone failed: {e}")
