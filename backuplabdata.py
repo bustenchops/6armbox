@@ -5,8 +5,8 @@ import subprocess
 
 # Configuration
 source_folder = "~/6armbox"  # Replace with your actual source folder
-videos_root = "~/6armbox/videos"
-backup_target = "/media/6armbox"
+videos_root = "/videos"
+backup_target = "/media/6armboxDATA"
 
 # Step 1: Create date-named folder if it doesn't exist
 today = datetime.date.today().strftime("%Y-%m-%d")
