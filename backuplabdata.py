@@ -4,8 +4,8 @@ import datetime
 import subprocess
 
 # Configuration
-source_folder = ""  # Replace with your actual source folder
-videos_root = "./videos"
+source_folder = "/home/lhm403/6armbox/"  # Replace with your actual source folder
+videos_root = "/home/lhm403/6armbox/videos"
 backup_target = "/media/6armboxDATA"
 
 # Step 1: Create date-named folder if it doesn't exist
