@@ -21,7 +21,9 @@ else:
 # Step 2: Move specified file types
 file_extensions = [".csv", ".jpg", ".h264", ".mp4"]
 for ext in file_extensions:
+    print('checking for ', ext, ' files')
     files = [f for f in os.listdir(source_folder) if f.endswith(ext)]
+
     for file in files:
         src_path = os.path.join(source_folder, file)
         dst_path = os.path.join(target_folder, file)
