@@ -1,5 +1,3 @@
-
-import cv2
 from picamera2 import Picamera2
 from picamera2.encoders import H264Encoder
 from datetime import datetime
@@ -57,28 +55,20 @@ def stop_record(timestamp: datetime):
     except Exception as e:
         print(f"Error stopping recording: {e}")
 
-# Main loop
-print("Press 'M' to start recording, 'Q' to stop and exit.")
+# Start recording immediately
+print("Starting recording automatically...")
+camera.start()
+start_record(datetime.now())
+
 try:
     while True:
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('m'):
-            if not recording:
-                start_record(datetime.now())
-        elif key == ord('q'):
-            if recording:
-                stop_record(datetime.now())
-            break
-        time.sleep(0.1)
+        time.sleep(0.1)  # Keep the program alive
 
 except KeyboardInterrupt:
     print("Interrupted by user.")
 
 finally:
-    try:
-        camera.stop_recording()
-    except Exception:
-        pass
+    if recording:
+        stop_record(datetime.now())
     camera.close()
-    cv2.destroyAllWindows()
     print("Program exited.")
