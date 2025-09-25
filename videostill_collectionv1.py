@@ -67,7 +67,7 @@ for filename in os.listdir(output_directory):
         cropped_image = image[:, 80:width-80]
 
         # Resize to 300x300 pixels
-        resized_image = cv2.resize(cropped_image, (320 320))
+        resized_image = cv2.resize(cropped_image, (320, 320))
 
         # Save the resized image
         resized_path = os.path.join(resized_directory, filename)
