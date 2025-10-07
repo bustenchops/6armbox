@@ -159,8 +159,8 @@ def main():
             break
 
     previous_ret, frame = cap.read()
-        if not ret:
-            continue
+    if not ret:
+        continue
     tracker = None
     tracking = False
     paused = False
