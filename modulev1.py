@@ -11,7 +11,7 @@ cap.set(cv2.CAP_PROP_CONTRAST, 0.8)
 
 while True:
     ret, frame = cap.read()
-    cv2.imshow('Camera', frame)
+    cv2.imshow(frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
