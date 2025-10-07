@@ -8,7 +8,7 @@ import datetime
 import csv
 import threading
 import RPi.GPIO as GPIO
-from picamera2 import Picamera2
+from picamera2 import Picamera2, Preview
 
 # Constants
 WIDTH, HEIGHT = 640, 480
@@ -72,6 +72,7 @@ def stop_led_thread():
 
 def initialize_camera():
     picam2 = Picamera2()
+    picam2.start_preview(Preview.NULL)
     cfg = picam2.create_preview_configuration(main={"format": "BGR888", "size": (WIDTH, HEIGHT)})
     picam2.configure(cfg)
     picam2.set_controls({
