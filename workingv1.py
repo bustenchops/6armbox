@@ -52,7 +52,6 @@ def stop_led_thread():
     global led_thread_running
     led_thread_running = False
     if led_thread:
-    if led_thread:
         led_thread.join()
 
 def initialize_camera():
