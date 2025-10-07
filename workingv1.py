@@ -7,7 +7,7 @@ import time
 import datetime
 import csv
 import threading
-import RPi.GPIO as GPIO
+
 
 
 # Constants
@@ -29,21 +29,6 @@ cam6 = 25
 lens_pos = 0
 
 # GPIO setup
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(LED_PIN, GPIO.OUT)
-GPIO.setup(cam1, GPIO.OUT)
-GPIO.setup(cam2, GPIO.OUT)
-GPIO.setup(cam3, GPIO.OUT)
-GPIO.setup(cam4, GPIO.OUT)
-GPIO.setup(cam5, GPIO.OUT)
-GPIO.setup(cam6, GPIO.OUT)
-
-GPIO.output(cam1, GPIO.LOW)
-GPIO.output(cam2, GPIO.LOW)
-GPIO.output(cam3, GPIO.LOW)
-GPIO.output(cam4, GPIO.LOW)
-GPIO.output(cam5, GPIO.LOW)
-GPIO.output(cam6, GPIO.LOW)
 
 # LED flashing thread control
 led_thread = None
@@ -52,10 +37,10 @@ led_thread_running = False
 def led_flashing():
     global led_thread_running
     while led_thread_running:
-        GPIO.output(LED_PIN, GPIO.HIGH)
-        time.sleep(FLASHDURATION)
-        GPIO.output(LED_PIN, GPIO.LOW)
-        time.sleep(FLASHDURATION)
+        print('on')
+        time.sleep(2)
+        print('off')
+        time.sleep(2)
 
 def start_led_thread():
     global led_thread, led_thread_running
@@ -66,7 +51,7 @@ def start_led_thread():
 def stop_led_thread():
     global led_thread_running
     led_thread_running = False
-    GPIO.output(LED_PIN, GPIO.LOW)
+    if led_thread:
     if led_thread:
         led_thread.join()
 
@@ -211,67 +196,25 @@ def main():
                 center = in_center(cx, cy)
                 print(f"Object in piezone {zone}" + (" and centerzone" if center else ""))
                 if center:
-                    GPIO.output(cam1,GPIO.LOW)
-                    GPIO.output(cam2,GPIO.LOW)
-                    GPIO.output(cam3,GPIO.LOW)
-                    GPIO.output(cam4,GPIO.LOW)
-                    GPIO.output(cam5,GPIO.LOW)
-                    GPIO.output(cam6,GPIO.LOW)
                     cameratriggered = 0
                     print('no camera on')
                 else:
                     if zone == 1:
-                        GPIO.output(cam1, GPIO.LOW) # normally high in 6 arm box
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 1
                         print('GPIO ', cam1, ' triggered')
                     if zone == 2:
-                        GPIO.output(cam1, GPIO.LOW)
-                        GPIO.output(cam2, GPIO.HIGH)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 2
                         print('GPIO ', cam2, ' triggered')
                     if zone == 3:
-                        GPIO.output(cam1, GPIO.LOW)
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.HIGH)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 3
                         print('GPIO ', cam3, ' triggered')
                     if zone == 4:
-                        GPIO.output(cam1, GPIO.LOW)
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.HIGH)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 4
                         print('GPIO ', cam4, ' triggered')
                     if zone == 5:
-                        GPIO.output(cam1, GPIO.HIGH) #for 2 arms...normally low for 6 arm
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.HIGH)
-                        GPIO.output(cam6, GPIO.LOW)
                         cameratriggered = 5
                         print('GPIO ', cam5, ' triggered')
                     if zone == 6:
-                        GPIO.output(cam1, GPIO.LOW)
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.HIGH)
                         cameratriggered = 6
                         print('GPIO ', cam6, ' triggered')
 
@@ -353,7 +296,6 @@ def main():
     if log_file:
         log_file.close()
     stop_led_thread()
-    GPIO.cleanup()
     cv2.destroyAllWindows()
     cap.release()
 
