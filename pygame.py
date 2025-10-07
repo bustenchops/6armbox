@@ -12,4 +12,4 @@ if cams:
     pygame.image.save(img, "capture.jpg") # Save the captured image
     cam.stop()
 else:
-print("No camera found.")
+    print("No camera found.")
