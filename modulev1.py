@@ -1,27 +1,19 @@
-
 import cv2
 
-# Open the default camera (usually the first webcam)
+# Capture video from the default camera
 cap = cv2.VideoCapture(0)
 
-if not cap.isOpened():
-    print("Error: Could not open camera.")
-    exit()
+# Set camera parameters
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.5)
+cap.set(cv2.CAP_PROP_CONTRAST, 0.8)
 
-# Loop to continuously get frames
 while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("Error: Failed to capture frame.")
-        break
+ret, frame = cap.read()
+cv2.imshow('Camera', frame)
+if cv2.waitKey(1) & 0xFF == ord('q'):
+break
 
-    # Display the frame
-    cv2.imshow('Real-Time Camera View', frame)
-
-    # Press 'q' to exit the loop
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# Release the camera and close windows
 cap.release()
 cv2.destroyAllWindows()
