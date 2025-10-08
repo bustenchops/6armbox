@@ -229,12 +229,7 @@ def main():
             ycenter = ymin + (int(round((ymax - ymin) / 2)))
             cv2.circle(frame, (xcenter, ycenter), 5, (0, 0, 255), thickness=-1)
         if not paused:
-
-
-
-        if xcenter is not None
-
-
+            if xcenter is not None
                 zone = determine_piezone(xcenter, ycenter)
                 center = in_center(xcenter, ycenter)
                 print(f"Object in piezone {zone}" + (" and centerzone" if center else ""))
@@ -307,17 +302,6 @@ def main():
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
                 cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
                 cv2.putText(frame, f"Zone {zone}" + (" + Center" if center else ""), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
-
-
-
-
-
-
-
-
-
-
-
                 log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
             else:
 
