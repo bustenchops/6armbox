@@ -52,12 +52,8 @@ led_thread_running = False
 def led_flashing():
     global led_thread_running
     while led_thread_running:
-        zone = 1
-        log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
         GPIO.output(LED_PIN, GPIO.HIGH)
         time.sleep(FLASHDURATION)
-        zone = 0
-        log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
         GPIO.output(LED_PIN, GPIO.LOW)
         time.sleep(FLASHDURATION)
 
