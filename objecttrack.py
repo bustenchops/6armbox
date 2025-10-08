@@ -226,7 +226,7 @@ def main():
             cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 3)
 
             # Draw circle in center
-            xcenter = xmin + (int(round((xmax - xmin) / 2)))
+            xcenter = xmin + (int(round((xmax - xmin) / 2)))  # something wrong here....need to troubleshoot. will figure this out later.
             ycenter = ymin + (int(round((ymax - ymin) / 2)))
             cv2.circle(frame, (xcenter, ycenter), 5, (0, 0, 255), thickness=-1)
         if not paused:
