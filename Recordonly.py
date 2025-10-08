@@ -115,10 +115,19 @@ def main():
     log_writer = csv.writer(log_file)
     log_writer.writerow(["Frame", "Timestamp", "LED state", "InCenter", "FPS", "Camera"])
     start_led_thread()
-
+    timestamp = datetime.datetime.now()
+    cameratriggered = 7007
+    GPIO.output(cam1, GPIO.HIGH)
+    GPIO.output(cam2, GPIO.HIGH)
+    GPIO.output(cam3, GPIO.HIGH)
+    GPIO.output(cam4, GPIO.HIGH)
+    GPIO.output(cam5, GPIO.HIGH)
+    GPIO.output(cam6, GPIO.HIGH)
     frame_count = 0
-    prev_time = time.time()
     fps = 0.0
+    log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
+    prev_time = time.time()
+
     cameratriggered = 0
 
     while True:
@@ -132,7 +141,7 @@ def main():
         fps = 0.9 * fps + 0.1 * (1.0 / dt)
 
         if not paused:
-
+            cameratriggered = 0
             log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
 
             if video_writer:
