@@ -334,7 +334,7 @@ def main():
             log_filename = generate_filename(base_time, sample_number, session_number, "log.csv")
             log_file = open(log_filename, mode='w', newline='')
             log_writer = csv.writer(log_file)
-            log_writer.writerow(["Frame", "Timestamp", "Piezone", "InCenter", "FPS"])
+            log_writer.writerow(["Frame", "Timestamp", "Piezone", "InCenter", "FPS", "Camera"])
             print(f"Started new log file: {log_filename}")
 
             start_led_thread()

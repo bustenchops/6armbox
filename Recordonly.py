@@ -25,6 +25,9 @@ cam5 = 24
 cam6 = 25
 lens_pos = 0
 
+zone = 99
+center = 66
+
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_PIN, GPIO.OUT)
@@ -49,8 +52,12 @@ led_thread_running = False
 def led_flashing():
     global led_thread_running
     while led_thread_running:
+        zone = 1
+        log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
         GPIO.output(LED_PIN, GPIO.HIGH)
         time.sleep(FLASHDURATION)
+        zone = 0
+        log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
         GPIO.output(LED_PIN, GPIO.LOW)
         time.sleep(FLASHDURATION)
 
@@ -106,7 +113,7 @@ def main():
     video_writer = cv2.VideoWriter(video_filename, cv2.VideoWriter_fourcc(*'mp4v'), FPS, (WIDTH, HEIGHT))
     log_file = open(log_filename, mode='w', newline='')
     log_writer = csv.writer(log_file)
-    log_writer.writerow(["Frame", "Timestamp", "Piezone", "InCenter", "FPS", "Camera"])
+    log_writer.writerow(["Frame", "Timestamp", "LED state", "InCenter", "FPS", "Camera"])
     start_led_thread()
 
     frame_count = 0
@@ -126,7 +133,7 @@ def main():
 
         if not paused:
 
-                log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
+            log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
 
             if video_writer:
                 video_writer.write(frame)
@@ -171,7 +178,7 @@ def main():
             log_filename = generate_filename(base_time, sample_number, session_number, "log.csv")
             log_file = open(log_filename, mode='w', newline='')
             log_writer = csv.writer(log_file)
-            log_writer.writerow(["Frame", "Timestamp", "Piezone", "InCenter", "FPS"])
+            log_writer.writerow(["Frame", "Timestamp", "LEDS State", "InCenter", "FPS", "Camera"])
             print(f"Started new log file: {log_filename}")
 
             start_led_thread()
