@@ -18,7 +18,8 @@ FPS = 24
 HEX_RADIUS = 225
 CENTER_RADIUS = 30
 
-
+xcenter = None
+ycenter = None
 
 LED_PIN = 2
 FLASHDURATION = 2
