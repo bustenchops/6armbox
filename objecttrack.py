@@ -17,6 +17,9 @@ WIDTH, HEIGHT = 640, 480
 FPS = 24
 HEX_RADIUS = 225
 CENTER_RADIUS = 30
+
+
+
 LED_PIN = 2
 FLASHDURATION = 2
 cam1 = 14
@@ -226,88 +229,104 @@ def main():
             ycenter = ymin + (int(round((ymax - ymin) / 2)))
             cv2.circle(frame, (xcenter, ycenter), 5, (0, 0, 255), thickness=-1)
         if not paused:
-            zone = determine_piezone(xcenter, ycenter)
-            center = in_center(xcenter, ycenter)
-            print(f"Object in piezone {zone}" + (" and centerzone" if center else ""))
-            if center:
-                # GPIO.output(cam1,GPIO.LOW)
-                # GPIO.output(cam2,GPIO.LOW)
-                # GPIO.output(cam3,GPIO.LOW)
-                # GPIO.output(cam4,GPIO.LOW)
-                # GPIO.output(cam5,GPIO.LOW)
-                # GPIO.output(cam6,GPIO.LOW)
-                cameratriggered = 0
-                print('no camera on')
+
+
+
+        if xcenter is not None
+
+
+                zone = determine_piezone(xcenter, ycenter)
+                center = in_center(xcenter, ycenter)
+                print(f"Object in piezone {zone}" + (" and centerzone" if center else ""))
+                if center:
+                    # GPIO.output(cam1,GPIO.LOW)
+                    # GPIO.output(cam2,GPIO.LOW)
+                    # GPIO.output(cam3,GPIO.LOW)
+                    # GPIO.output(cam4,GPIO.LOW)
+                    # GPIO.output(cam5,GPIO.LOW)
+                    # GPIO.output(cam6,GPIO.LOW)
+                    cameratriggered = 0
+                    print('no camera on')
+                else:
+                    if zone == 1:
+                        # GPIO.output(cam1, GPIO.HIGH) # normally high in 6 arm box
+                        # GPIO.output(cam2, GPIO.LOW)
+                        # GPIO.output(cam3, GPIO.LOW)
+                        # GPIO.output(cam4, GPIO.LOW)
+                        # GPIO.output(cam5, GPIO.LOW)
+                        # GPIO.output(cam6, GPIO.LOW)
+                        cameratriggered = 1
+                        print('GPIO ', cam1, ' triggered')
+                    if zone == 2:
+                        # GPIO.output(cam1, GPIO.LOW)
+                        # GPIO.output(cam2, GPIO.HIGH)
+                        # GPIO.output(cam3, GPIO.LOW)
+                        # GPIO.output(cam4, GPIO.LOW)
+                        # GPIO.output(cam5, GPIO.LOW)
+                        # GPIO.output(cam6, GPIO.LOW)
+                        cameratriggered = 2
+                        print('GPIO ', cam2, ' triggered')
+                    if zone == 3:
+                        # GPIO.output(cam1, GPIO.LOW)
+                        # GPIO.output(cam2, GPIO.LOW)
+                        # GPIO.output(cam3, GPIO.HIGH)
+                        # GPIO.output(cam4, GPIO.LOW)
+                        # GPIO.output(cam5, GPIO.LOW)
+                        # GPIO.output(cam6, GPIO.LOW)
+                        cameratriggered = 3
+                        print('GPIO ', cam3, ' triggered')
+                    if zone == 4:
+                        # GPIO.output(cam1, GPIO.LOW)
+                        # GPIO.output(cam2, GPIO.LOW)
+                        # GPIO.output(cam3, GPIO.LOW)
+                        # GPIO.output(cam4, GPIO.HIGH)
+                        # GPIO.output(cam5, GPIO.LOW)
+                        # GPIO.output(cam6, GPIO.LOW)
+                        cameratriggered = 4
+                        print('GPIO ', cam4, ' triggered')
+                    if zone == 5:
+                        # GPIO.output(cam1, GPIO.HIGH) #for 2 arms...normally low for 6 arm
+                        # GPIO.output(cam2, GPIO.LOW)
+                        # GPIO.output(cam3, GPIO.LOW)
+                        # GPIO.output(cam4, GPIO.LOW)
+                        # GPIO.output(cam5, GPIO.HIGH)
+                        # GPIO.output(cam6, GPIO.LOW)
+                        cameratriggered = 5
+                        print('GPIO ', cam5, ' triggered')
+                    if zone == 6:
+                        # GPIO.output(cam1, GPIO.LOW)
+                        # GPIO.output(cam2, GPIO.LOW)
+                        # GPIO.output(cam3, GPIO.LOW)
+                        # GPIO.output(cam4, GPIO.LOW)
+                        # GPIO.output(cam5, GPIO.LOW)
+                        # GPIO.output(cam6, GPIO.HIGH)
+                        cameratriggered = 6
+                        print('GPIO ', cam6, ' triggered')
+
+
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
+                cv2.putText(frame, f"Zone {zone}" + (" + Center" if center else ""), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+
+
+
+
+
+
+
+
+
+
+
+                log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
             else:
-                if zone == 1:
-                    # GPIO.output(cam1, GPIO.HIGH) # normally high in 6 arm box
-                    # GPIO.output(cam2, GPIO.LOW)
-                    # GPIO.output(cam3, GPIO.LOW)
-                    # GPIO.output(cam4, GPIO.LOW)
-                    # GPIO.output(cam5, GPIO.LOW)
-                    # GPIO.output(cam6, GPIO.LOW)
-                    cameratriggered = 1
-                    print('GPIO ', cam1, ' triggered')
-                if zone == 2:
-                    # GPIO.output(cam1, GPIO.LOW)
-                    # GPIO.output(cam2, GPIO.HIGH)
-                    # GPIO.output(cam3, GPIO.LOW)
-                    # GPIO.output(cam4, GPIO.LOW)
-                    # GPIO.output(cam5, GPIO.LOW)
-                    # GPIO.output(cam6, GPIO.LOW)
-                    cameratriggered = 2
-                    print('GPIO ', cam2, ' triggered')
-                if zone == 3:
-                    # GPIO.output(cam1, GPIO.LOW)
-                    # GPIO.output(cam2, GPIO.LOW)
-                    # GPIO.output(cam3, GPIO.HIGH)
-                    # GPIO.output(cam4, GPIO.LOW)
-                    # GPIO.output(cam5, GPIO.LOW)
-                    # GPIO.output(cam6, GPIO.LOW)
-                    cameratriggered = 3
-                    print('GPIO ', cam3, ' triggered')
-                if zone == 4:
-                    # GPIO.output(cam1, GPIO.LOW)
-                    # GPIO.output(cam2, GPIO.LOW)
-                    # GPIO.output(cam3, GPIO.LOW)
-                    # GPIO.output(cam4, GPIO.HIGH)
-                    # GPIO.output(cam5, GPIO.LOW)
-                    # GPIO.output(cam6, GPIO.LOW)
-                    cameratriggered = 4
-                    print('GPIO ', cam4, ' triggered')
-                if zone == 5:
-                    # GPIO.output(cam1, GPIO.HIGH) #for 2 arms...normally low for 6 arm
-                    # GPIO.output(cam2, GPIO.LOW)
-                    # GPIO.output(cam3, GPIO.LOW)
-                    # GPIO.output(cam4, GPIO.LOW)
-                    # GPIO.output(cam5, GPIO.HIGH)
-                    # GPIO.output(cam6, GPIO.LOW)
-                    cameratriggered = 5
-                    print('GPIO ', cam5, ' triggered')
-                if zone == 6:
-                    # GPIO.output(cam1, GPIO.LOW)
-                    # GPIO.output(cam2, GPIO.LOW)
-                    # GPIO.output(cam3, GPIO.LOW)
-                    # GPIO.output(cam4, GPIO.LOW)
-                    # GPIO.output(cam5, GPIO.LOW)
-                    # GPIO.output(cam6, GPIO.HIGH)
-                    cameratriggered = 6
-                    print('GPIO ', cam6, ' triggered')
 
 
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
-            cv2.putText(frame, f"Zone {zone}" + (" + Center" if center else ""), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+                print("Tracking lost. Reinitializing...")
+                log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), 0, False, round(fps, 2), cameratriggered])
 
-            log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
-        else:
-
-
-            print("Tracking lost. Reinitializing...")
-            log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), 0, False, round(fps, 2), cameratriggered])
-
-        if video_writer:
-            video_writer.write(resized_frame)
+            if video_writer:
+                video_writer.write(resized_frame)
 
         cv2.putText(resized_frame, f"FPS: {fps:.2f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
         cv2.imshow("Tracking", resized_frame)
@@ -337,6 +356,8 @@ def main():
         elif key == ord('c') and paused:
             paused = False
             session_number += 1
+
+
             print("Resumed tracking and recording.")
 
             # Start a new video file
