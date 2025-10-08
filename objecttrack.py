@@ -9,15 +9,14 @@ import csv
 import threading
 import RPi.GPIO as GPIO
 from picamera2 import Picamera2, Preview
+from tflite_runtime.interpreter import Interpreter
+import re
 
 # Constants
 WIDTH, HEIGHT = 640, 480
 FPS = 24
 HEX_RADIUS = 225
 CENTER_RADIUS = 30
-STATIONARY_THRESHOLD = 2.0
-MIN_AREA = 650
-NO_TRACKING_MARGIN = 100
 LED_PIN = 2
 FLASHDURATION = 2
 cam1 = 14
@@ -27,6 +26,9 @@ cam4 = 23
 cam5 = 24
 cam6 = 25
 lens_pos = 0
+
+CROP_WIDTH = 480
+RESIZE_DIM = (320, 320)
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
@@ -48,6 +50,53 @@ GPIO.output(cam6, GPIO.LOW)
 # LED flashing thread control
 led_thread = None
 led_thread_running = False
+
+def load_labels(path='labels.txt'):
+    """Loads the labels file. Supports files with or without index numbers."""
+    with open(path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+        labels = {}
+        for row_number, content in enumerate(lines):
+            pair = re.split(r'[:\s]+', content.strip(), maxsplit=1)
+            if len(pair) == 2 and pair[0].strip().isdigit():
+                labels[int(pair[0])] = pair[1].strip()
+            else:
+                labels[row_number] = pair[0].strip()
+    return labels
+
+def set_input_tensor(interpreter, image):
+    """Sets the input tensor."""
+    tensor_index = interpreter.get_input_details()[0]['index']
+    input_tensor = interpreter.tensor(tensor_index)()[0]
+    input_tensor[:, :] = np.expand_dims((image - 255) / 255, axis=0)
+
+
+def get_output_tensor(interpreter, index):
+    """Returns the output tensor at the given index."""
+    output_details = interpreter.get_output_details()[index]
+    tensor = np.squeeze(interpreter.get_tensor(output_details['index']))
+    return tensor
+
+def detect_objects(interpreter, image, threshold):
+    """Returns a list of detection results, each a dictionary of object info."""
+    set_input_tensor(interpreter, image)
+    interpreter.invoke()
+    # Get all output details
+    boxes = get_output_tensor(interpreter, 0)
+    classes = get_output_tensor(interpreter, 1)
+    scores = get_output_tensor(interpreter, 2)
+    count = int(get_output_tensor(interpreter, 3))
+
+    results = []
+    for i in range(count):
+        if scores[i] >= threshold:
+            result = {
+                'bounding_box': boxes[i],
+                'class_id': classes[i],
+                'score': scores[i]
+            }
+            results.append(result)
+    return results
 
 def led_flashing():
     global led_thread_running
@@ -108,41 +157,22 @@ def in_center(cx, cy):
     dy = cy - HEIGHT // 2
     return dx * dx + dy * dy <= CENTER_RADIUS * CENTER_RADIUS
 
-def create_tracker():
-    try:
-        return cv2.TrackerKCF_create()
-    except AttributeError:
-        return cv2.legacy.TrackerKCF_create()
 
 def generate_filename(base_time, sample_number, session_number, suffix):
     timestamp = base_time.strftime("%Y%m%d_%H%M%S")
     return f"{timestamp}_Sample{sample_number}_Session{session_number}_{suffix}"
 
-def find_moving_object_bbox(current_frame, previous_frame):
-    gray_current = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
-    gray_previous = cv2.cvtColor(previous_frame, cv2.COLOR_BGR2GRAY)
-    frame_diff = cv2.absdiff(gray_previous, gray_current)
-    blurred = cv2.GaussianBlur(frame_diff, (5, 5), 0)
-    _, thresh = cv2.threshold(blurred, 25, 255, cv2.THRESH_BINARY)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    moving_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > MIN_AREA]
-    if not moving_contours:
-        return None
-    moving_object = max(moving_contours, key=cv2.contourArea)
-    moments = cv2.moments(moving_object)
-    if moments["m00"] == 0:
-        return None
-    cx = int(moments["m10"] / moments["m00"])
-    cy = int(moments["m01"] / moments["m00"])
-    if cx < NO_TRACKING_MARGIN or cx > WIDTH - NO_TRACKING_MARGIN:
-        return None
-    x, y, w, h = cv2.boundingRect(moving_object)
-    return (x, y, w, h)
+
 
 def main():
     base_time = datetime.datetime.now()
     sample_number = input("Enter sample number: ")
     session_number = 1
+
+    labels = load_labels()
+    interpreter = Interpreter('detect.tflite')
+    interpreter.allocate_tensors()
+    _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
     picam2 = initialize_camera()
     print("Press spacebar to start tracking...")
@@ -153,12 +183,8 @@ def main():
         if cv2.waitKey(1) & 0xFF == ord(' '):
             break
 
-    previous_frame = picam2.capture_array()
-    tracker = None
-    tracking = False
+
     paused = False
-    last_position = None
-    stationary_start = None
 
     video_filename = generate_filename(base_time, sample_number, session_number, "video.mp4")
     log_filename = generate_filename(base_time, sample_number, session_number, "log.csv")
@@ -175,7 +201,12 @@ def main():
 
     while True:
         frame = picam2.capture_array()
-        draw_zones(frame)
+
+        cropped_frame = frame[:, 80:560]
+        resized_frame = cv2.resize(cropped_frame, RESIZE_DIM)
+        res = detect_objects(interpreter, resized_frame, 0.8)
+
+        draw_zones(resized_frame)
         timestamp = datetime.datetime.now()
         frame_count += 1
         current_time = time.time()
@@ -183,118 +214,105 @@ def main():
         prev_time = current_time
         fps = 0.9 * fps + 0.1 * (1.0 / dt)
 
+        for result in res:
+            ymin, xmin, ymax, xmax = result['bounding_box']
+            xmin = int(max(1, xmin * WIDTH))
+            xmax = int(min(WIDTH, xmax * WIDTH))
+            ymin = int(max(1, ymin * HEIGHT))
+            ymax = int(min(HEIGHT, ymax * HEIGHT))
+
+            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 3)
+
+            # Draw circle in center
+            xcenter = xmin + (int(round((xmax - xmin) / 2)))
+            ycenter = ymin + (int(round((ymax - ymin) / 2)))
+            cv2.circle(frame, (xcenter, ycenter), 5, (0, 0, 255), thickness=-1)
         if not paused:
-            if tracker is None or not tracking:
-                bbox = find_moving_object_bbox(frame, previous_frame)
-                if bbox:
-                    tracker = create_tracker()
-                    tracker.init(frame, bbox)
-                    tracking = True
-                    stationary_start = time.time()
-
-            if tracker is not None:
-                success, bbox = tracker.update(frame)
+            zone = determine_piezone(xcenter, ycenter)
+            center = in_center(xcenter, ycenter)
+            print(f"Object in piezone {zone}" + (" and centerzone" if center else ""))
+            if center:
+                # GPIO.output(cam1,GPIO.LOW)
+                # GPIO.output(cam2,GPIO.LOW)
+                # GPIO.output(cam3,GPIO.LOW)
+                # GPIO.output(cam4,GPIO.LOW)
+                # GPIO.output(cam5,GPIO.LOW)
+                # GPIO.output(cam6,GPIO.LOW)
+                cameratriggered = 0
+                print('no camera on')
             else:
-                success = False
-
-            if success:
-                x, y, w, h = map(int, bbox)
-                cx, cy = x + w // 2, y + h // 2
-                zone = determine_piezone(cx, cy)
-                center = in_center(cx, cy)
-                print(f"Object in piezone {zone}" + (" and centerzone" if center else ""))
-                if center:
-                    GPIO.output(cam1,GPIO.LOW)
-                    GPIO.output(cam2,GPIO.LOW)
-                    GPIO.output(cam3,GPIO.LOW)
-                    GPIO.output(cam4,GPIO.LOW)
-                    GPIO.output(cam5,GPIO.LOW)
-                    GPIO.output(cam6,GPIO.LOW)
-                    cameratriggered = 0
-                    print('no camera on')
-                else:
-                    if zone == 1:
-                        GPIO.output(cam1, GPIO.LOW) # normally high in 6 arm box
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.LOW)
-                        cameratriggered = 1
-                        print('GPIO ', cam1, ' triggered')
-                    if zone == 2:
-                        GPIO.output(cam1, GPIO.LOW)
-                        GPIO.output(cam2, GPIO.HIGH)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.LOW)
-                        cameratriggered = 2
-                        print('GPIO ', cam2, ' triggered')
-                    if zone == 3:
-                        GPIO.output(cam1, GPIO.LOW)
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.HIGH)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.LOW)
-                        cameratriggered = 3
-                        print('GPIO ', cam3, ' triggered')
-                    if zone == 4:
-                        GPIO.output(cam1, GPIO.LOW)
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.HIGH)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.LOW)
-                        cameratriggered = 4
-                        print('GPIO ', cam4, ' triggered')
-                    if zone == 5:
-                        GPIO.output(cam1, GPIO.HIGH) #for 2 arms...normally low for 6 arm
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.HIGH)
-                        GPIO.output(cam6, GPIO.LOW)
-                        cameratriggered = 5
-                        print('GPIO ', cam5, ' triggered')
-                    if zone == 6:
-                        GPIO.output(cam1, GPIO.LOW)
-                        GPIO.output(cam2, GPIO.LOW)
-                        GPIO.output(cam3, GPIO.LOW)
-                        GPIO.output(cam4, GPIO.LOW)
-                        GPIO.output(cam5, GPIO.LOW)
-                        GPIO.output(cam6, GPIO.HIGH)
-                        cameratriggered = 6
-                        print('GPIO ', cam6, ' triggered')
+                if zone == 1:
+                    # GPIO.output(cam1, GPIO.HIGH) # normally high in 6 arm box
+                    # GPIO.output(cam2, GPIO.LOW)
+                    # GPIO.output(cam3, GPIO.LOW)
+                    # GPIO.output(cam4, GPIO.LOW)
+                    # GPIO.output(cam5, GPIO.LOW)
+                    # GPIO.output(cam6, GPIO.LOW)
+                    cameratriggered = 1
+                    print('GPIO ', cam1, ' triggered')
+                if zone == 2:
+                    # GPIO.output(cam1, GPIO.LOW)
+                    # GPIO.output(cam2, GPIO.HIGH)
+                    # GPIO.output(cam3, GPIO.LOW)
+                    # GPIO.output(cam4, GPIO.LOW)
+                    # GPIO.output(cam5, GPIO.LOW)
+                    # GPIO.output(cam6, GPIO.LOW)
+                    cameratriggered = 2
+                    print('GPIO ', cam2, ' triggered')
+                if zone == 3:
+                    # GPIO.output(cam1, GPIO.LOW)
+                    # GPIO.output(cam2, GPIO.LOW)
+                    # GPIO.output(cam3, GPIO.HIGH)
+                    # GPIO.output(cam4, GPIO.LOW)
+                    # GPIO.output(cam5, GPIO.LOW)
+                    # GPIO.output(cam6, GPIO.LOW)
+                    cameratriggered = 3
+                    print('GPIO ', cam3, ' triggered')
+                if zone == 4:
+                    # GPIO.output(cam1, GPIO.LOW)
+                    # GPIO.output(cam2, GPIO.LOW)
+                    # GPIO.output(cam3, GPIO.LOW)
+                    # GPIO.output(cam4, GPIO.HIGH)
+                    # GPIO.output(cam5, GPIO.LOW)
+                    # GPIO.output(cam6, GPIO.LOW)
+                    cameratriggered = 4
+                    print('GPIO ', cam4, ' triggered')
+                if zone == 5:
+                    # GPIO.output(cam1, GPIO.HIGH) #for 2 arms...normally low for 6 arm
+                    # GPIO.output(cam2, GPIO.LOW)
+                    # GPIO.output(cam3, GPIO.LOW)
+                    # GPIO.output(cam4, GPIO.LOW)
+                    # GPIO.output(cam5, GPIO.HIGH)
+                    # GPIO.output(cam6, GPIO.LOW)
+                    cameratriggered = 5
+                    print('GPIO ', cam5, ' triggered')
+                if zone == 6:
+                    # GPIO.output(cam1, GPIO.LOW)
+                    # GPIO.output(cam2, GPIO.LOW)
+                    # GPIO.output(cam3, GPIO.LOW)
+                    # GPIO.output(cam4, GPIO.LOW)
+                    # GPIO.output(cam5, GPIO.LOW)
+                    # GPIO.output(cam6, GPIO.HIGH)
+                    cameratriggered = 6
+                    print('GPIO ', cam6, ' triggered')
 
 
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
-                cv2.putText(frame, f"Zone {zone}" + (" + Center" if center else ""), (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
+            cv2.putText(frame, f"Zone {zone}" + (" + Center" if center else ""), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
 
-                if last_position and (cx, cy) == last_position:
-                    if time.time() - stationary_start > STATIONARY_THRESHOLD:
-                        tracking = False
-                        tracker = None
-                        print("Object stationary too long. Reinitializing tracker.")
-                else:
-                    stationary_start = time.time()
-                last_position = (cx, cy)
+            log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
+        else:
 
-                log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
-            else:
-                tracking = False
-                tracker = None
-                print("Tracking lost. Reinitializing...")
-                log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), 0, False, round(fps, 2), cameratriggered])
 
-            if video_writer:
-                video_writer.write(frame)
+            print("Tracking lost. Reinitializing...")
+            log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), 0, False, round(fps, 2), cameratriggered])
 
-        cv2.putText(frame, f"FPS: {fps:.2f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
-        cv2.imshow("Tracking", frame)
+        if video_writer:
+            video_writer.write(resized_frame)
+
+        cv2.putText(resized_frame, f"FPS: {fps:.2f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+        cv2.imshow("Tracking", resized_frame)
         key = cv2.waitKey(1) & 0xFF
 
         if key == ord('q'):
@@ -321,8 +339,6 @@ def main():
         elif key == ord('c') and paused:
             paused = False
             session_number += 1
-            tracking = False
-            tracker = None
             print("Resumed tracking and recording.")
 
             # Start a new video file
@@ -339,7 +355,7 @@ def main():
 
             start_led_thread()
 
-        previous_frame = frame.copy()
+
 
     if video_writer:
         video_writer.release()

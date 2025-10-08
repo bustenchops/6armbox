@@ -8,7 +8,7 @@ from picamera2 import Picamera2
 # Constants
 WIDTH, HEIGHT = 640, 480
 CROP_WIDTH = 480
-RESIZE_DIM = (300, 300)
+RESIZE_DIM = (320, 320)
 FPS = 24
 lens_pos = 0
 
