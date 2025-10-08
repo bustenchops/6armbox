@@ -230,7 +230,7 @@ def main():
             ycenter = ymin + (int(round((ymax - ymin) / 2)))
             cv2.circle(frame, (xcenter, ycenter), 5, (0, 0, 255), thickness=-1)
         if not paused:
-            if xcenter is > 0:
+            if xcenter > 0:
                 zone = determine_piezone(xcenter, ycenter)
                 center = in_center(xcenter, ycenter)
                 print(f"Object in piezone {zone}" + (" and centerzone" if center else ""))
