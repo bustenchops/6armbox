@@ -143,8 +143,6 @@ def draw_zones(frame):
         pt3 = (int(center[0] + HEX_RADIUS * np.cos(angle2)), int(center[1] + HEX_RADIUS * np.sin(angle2)))
         cv2.drawContours(frame, [np.array([pt1, pt2, pt3])], 0, (0, 255, 0), 1)
     cv2.circle(frame, center, CENTER_RADIUS, (255, 0, 0), 1)
-    cv2.rectangle(frame, (0, 0), (NO_TRACKING_MARGIN, HEIGHT), (0, 0, 255), 2)
-    cv2.rectangle(frame, (WIDTH - NO_TRACKING_MARGIN, 0), (WIDTH, HEIGHT), (0, 0, 255), 2)
 
 def determine_piezone(cx, cy):
     dx = cx - WIDTH // 2
