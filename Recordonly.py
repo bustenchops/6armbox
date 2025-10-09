@@ -208,6 +208,8 @@ def main():
 
     if video_writer:
         video_writer.release()
+    cameratriggered = 1111
+    log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
     if log_file:
         log_file.close()
     stop_led_thread()
