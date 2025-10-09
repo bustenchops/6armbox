@@ -36,7 +36,7 @@ for ext in file_extensions:
 
 # Step 3: Use rclone to copy /videos to /media/6armbox/
 try:
-    subprocess.run(["rclone", "copy", "-P", "--transfers 1",  videos_root, backup_target], check=True)
+    subprocess.run(["rclone", "copy", "-P",  videos_root, backup_target], check=True)
     print("rclone copy completed successfully.")
 except subprocess.CalledProcessError as e:
     print(f"rclone failed: {e}")
