@@ -137,7 +137,7 @@ def main():
         fps = 0.9 * fps + 0.1 * (1.0 / dt)
 
         if not paused:
-            cameratriggered = 0
+            cameratriggered = 4224
             log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
 
             if video_writer:
@@ -157,6 +157,14 @@ def main():
             if video_writer:
                 video_writer.release()
                 video_writer = None
+                GPIO.output(cam1, GPIO.LOW)
+                GPIO.output(cam2, GPIO.LOW)
+                GPIO.output(cam3, GPIO.LOW)
+                GPIO.output(cam4, GPIO.LOW)
+                GPIO.output(cam5, GPIO.LOW)
+                GPIO.output(cam6, GPIO.LOW)
+                cameratriggered = 1111
+                log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
                 print("Video file saved.")
 
             # Close current log file
@@ -185,6 +193,14 @@ def main():
             log_writer = csv.writer(log_file)
             log_writer.writerow(["Frame", "Timestamp", "LEDS State", "InCenter", "FPS", "Camera"])
             print(f"Started new log file: {log_filename}")
+            GPIO.output(cam1, GPIO.HIGH)
+            GPIO.output(cam2, GPIO.HIGH)
+            GPIO.output(cam3, GPIO.HIGH)
+            GPIO.output(cam4, GPIO.HIGH)
+            GPIO.output(cam5, GPIO.HIGH)
+            GPIO.output(cam6, GPIO.HIGH)
+            cameratriggered = 7007
+            log_writer.writerow([frame_count, timestamp.strftime("%H:%M:%S.%f"), zone, center, round(fps, 2), cameratriggered])
 
             start_led_thread()
 
