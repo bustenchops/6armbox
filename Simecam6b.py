@@ -43,10 +43,10 @@ video_config = camera.create_video_configuration(
 )
 camera.configure(video_config)
 camera.framerate = 25
-camera.set_controls({
-    "AfMode": 0,
-    "LensPosition": lens_pos
-})
+# camera.set_controls({
+#     "AfMode": 0,
+#     "LensPosition": lens_pos
+# })
 encoder = H264Encoder(bitrate=10000000) #can try to up
 
 def log_event(state: str, timestamp: datetime):
